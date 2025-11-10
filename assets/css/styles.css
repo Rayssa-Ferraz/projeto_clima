@@ -259,6 +259,135 @@ button:hover {
           brightness(1.2);
 }
 
+/* ========================= */
+/* 🌦️ Ajustes para novos elementos */
+/* ========================= */
+
+/* Ícone de clima (usando Weather Icons) */
+.weather-icon {
+  font-size: 4.5rem;
+  color: #245b9e;
+  margin-right: 0.75rem;
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Descrição do clima */
+#description {
+  color: var(--text-dark);
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-top: 0.25rem;
+  text-align: center;
+}
+
+/* Data e hora */
+#currentDate {
+  color: var(--text-light);
+  font-size: 1rem;
+  font-weight: 400;
+  margin-top: 0.25rem;
+  text-align: center;
+}
+
+/* Efeito de flutuação do ícone */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+/* 🌤️ Cor geral padrão */
+.weather-icon {
+  font-size: 4.5rem;
+  color: #245b9e; 
+  transition: color 0.5s ease;
+}
+
+/* ☀️ Ícones de dia limpo */
+.wi-day-sunny,
+.wi-day-sunny-overcast {
+  color: #ffcc00; 
+}
+
+/* 🌥️ Nublado */
+.wi-day-cloudy,
+.wi-cloudy {
+  color: #78a0bb; 
+}
+
+/* 🌧️ Chuva */
+.wi-rain,
+.wi-showers,
+.wi-rain-wind {
+  color: #024081;
+}
+
+/* ⛈️ Tempestade */
+.wi-thunderstorm {
+  color: #2e2957; 
+}
+
+/* ❄️ Neve */
+.wi-snow,
+.wi-snow-wind {
+  color: #90caf9; 
+}
+
+/* 🌫️ Neblina / Nevoeiro */
+.wi-fog {
+  color: #a3b8c2; 
+}
+
+/* ============================== */
+/* 🌙 MODO NOTURNO                */
+/* ============================== */
+body.night-mode .weather-icon {
+  filter: drop-shadow(0 0 6px rgba(155, 176, 255, 0.4));
+}
+
+/* 🌕 Céu limpo à noite */
+body.night-mode .wi-night-clear {
+  color: #ebdfb7; 
+}
+
+/* 🌙 Parcialmente limpo / poucas nuvens */
+body.night-mode .wi-night-alt-partly-cloudy {
+  color: #19246b; 
+}
+
+/* ☁️ Nublado à noite */
+body.night-mode .wi-night-alt-cloudy,
+body.night-mode .wi-night-alt-cloudy-high {
+  color: #44506b; 
+}
+
+/* 🌧️ Chuva à noite */
+body.night-mode .wi-night-alt-rain,
+body.night-mode .wi-night-alt-showers,
+body.night-mode .wi-night-alt-rain-wind {
+  color: #121e33; 
+}
+
+/* ⛈️ Tempestade à noite */
+body.night-mode .wi-night-alt-thunderstorm,
+body.night-mode .wi-night-alt-storm-showers {
+  color: #282250; 
+}
+
+/* ❄️ Neve à noite */
+body.night-mode .wi-night-alt-snow,
+body.night-mode .wi-night-alt-snow-wind {
+  color: #5c6a8a; 
+}
+
+/* 🌫️ Neblina à noite */
+body.night-mode .wi-night-fog {
+  color: #858b96; 
+}
+
+
 /* Responsividade */
 @media (max-width: 30rem) {
   .container {

@@ -13,39 +13,57 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
 
+    <!-- Ícones meteorológicos -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.12/css/weather-icons.min.css"
+    />
+
     <!-- CSS -->
     <link rel="stylesheet" href="./assets/css/styles.css" />
 </head>
 
 <body>
     <div class="container">
-        <!-- Tela de busca -->
+        <!-- 🌦️ TELA DE BUSCA -->
         <div id="searchScreen">
             <div class="weather-icons">
                 <img src="./assets/img/sol.png" alt="Sol" class="icon-sun" />
                 <img src="./assets/img/nuvem.png" alt="Nuvem" class="icon-cloud" />
                 <img src="./assets/img/chovendo.png" alt="Chuva" class="icon-rain" />
             </div>
+
             <h1>Previsão do Tempo</h1>
 
             <div class="search-area">
-                <input type="text" id="cityInput" placeholder="Digite o nome da cidade" />
+                <input
+                    type="text"
+                    id="cityInput"
+                    placeholder="Digite o nome da cidade"
+                />
                 <button id="searchBtn">Buscar</button>
             </div>
 
             <div id="loading">Carregando...</div>
+            <div id="error"></div>
         </div>
 
-        <!-- Tela de resultado -->
+        <!-- 🌤️ TELA DE RESULTADO -->
         <div id="resultScreen">
+            <!-- Cabeçalho com ícone e temperatura -->
             <div class="weather-header">
+                <i class="weather-icon" id="weatherIcon"></i>
                 <p id="temperature"></p>
             </div>
 
+            <!-- Informações do clima -->
             <div class="weather-info">
                 <h2 id="cityName"></h2>
+                <p id="description"></p>
+                <p id="currentDate"></p>
             </div>
 
+            <!-- Botão de voltar -->
             <button id="backBtn" title="Voltar ao início">
                 <img src="./assets/img/home.png" alt="Voltar" />
             </button>
@@ -55,5 +73,4 @@
     <!-- JS -->
     <script src="./assets/js/api.js"></script>
 </body>
-
 </html>
