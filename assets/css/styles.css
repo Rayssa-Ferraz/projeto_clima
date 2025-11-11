@@ -3,7 +3,9 @@
   --white: #ffffff;
   --text-dark: #2c3e50;
   --text-light: #5a6c7d;
-  --accent-blue: #4fc3f7;
+  --accent-blue: #348AFA;
+  --accente-blue-medium:#77AEF7;
+  --accente-blue-ligth:#B3CFF2;
   --accent-purple: #5e35b1;
   --shadow-light: rgba(0, 0, 0, 0.08);
   --shadow-medium: rgba(0, 0, 0, 0.15);
@@ -155,7 +157,7 @@ input:focus {
 /* Botão de Busca */
 button {
   padding: 0.875rem 1.75rem;
-  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  background: linear-gradient(135deg, var(--accent-blue), var(--accente-blue-medium));
   color: var(--white);
   border: none;
   border-radius: 0.75rem;
@@ -227,7 +229,7 @@ button:hover {
 /* Botão Voltar */
 #backBtn {
   margin-top: 0.5rem;
-  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  background: linear-gradient(135deg, var(--accent-blue), var(--accente-blue-medium));
   border: none;
   border-radius: 1rem;
   width: 3.5rem;
@@ -243,7 +245,7 @@ button:hover {
 #backBtn:hover {
   transform: translateY(-3px) scale(1.05);
   box-shadow: 0 0.9rem 1.5rem rgba(0, 0, 0, 0.2);
-  background: linear-gradient(135deg, #6ec1ff, #8663ff);
+  background: linear-gradient(135deg, #6ec1ff, #4b7de9);
 }
 
 #backBtn img {

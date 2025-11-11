@@ -1,6 +1,22 @@
-// ==========================
-// SELEÇÃO DE ELEMENTOS DO DOM
-// ==========================
+/**
+ * @fileoverview Aplicativo de Previsão do Tempo 
+ * @description Sistema web que consulta e exibe dados meteorológicos em tempo real,
+ * utilizando as APIs Open-Meteo (Geocoding e Weather) para buscar informações climáticas
+ * de cidades ao redor do mundo.
+ *
+ * @author Rayssa Ferraz
+ * @version 1.0.0
+ * @license MIT
+ */
+
+// =============================================================
+//  SELEÇÃO DE ELEMENTOS DO DOM
+// =============================================================
+
+/**
+ * Elementos HTML manipulados pela aplicação.
+ * @type {HTMLElement}
+ */
 const cityInput = document.getElementById('cityInput');
 const searchBtn = document.getElementById('searchBtn');
 const loading = document.getElementById('loading');
@@ -10,13 +26,30 @@ const temperature = document.getElementById('temperature');
 const cityName = document.getElementById('cityName');
 const backBtn = document.getElementById('backBtn');
 
-// Elementos novos para exibição de dados extras
+// Elementos criados dinamicamente
 let description, weatherIcon, currentDate;
 
-// ==========================
-// CONSTANTES
-// ==========================
+// =============================================================
+//  CONSTANTES E CONFIGURAÇÕES
+// =============================================================
+
+/**
+ * Tempo máximo de espera por resposta da API (em milissegundos).
+ * @constant {number}
+ * @default 10000
+ */
 const TIMEOUT_MS = 10000;
+
+/**
+ * Mensagens de erro padronizadas utilizadas em diferentes cenários.
+ * @constant {Object.<string, string>}
+ * @property {string} CIDADE_VAZIA - Quando o campo de busca está vazio.
+ * @property {string} CIDADE_NAO_ENCONTRADA - Quando a cidade não é localizada.
+ * @property {string} TIMEOUT - Quando a requisição excede o tempo limite.
+ * @property {string} REDE - Quando ocorre erro de conexão.
+ * @property {string} SERVIDOR - Quando ocorre falha no servidor.
+ * @property {string} GENERICO - Quando o erro é genérico.
+ */
 const MENSAGENS_ERRO = {
   CIDADE_VAZIA: 'Por favor, digite o nome de uma cidade.',
   CIDADE_NAO_ENCONTRADA: 'Cidade não encontrada. Tente novamente.',
@@ -26,11 +59,17 @@ const MENSAGENS_ERRO = {
   GENERICO: 'Erro ao buscar dados. Tente novamente.'
 };
 
-// ==========================
-// FUNÇÕES AUXILIARES
-// ==========================
+// =============================================================
+//  FUNÇÕES AUXILIARES
+// =============================================================
 
-// Função para retornar data e hora formatadas
+/**
+ * Retorna a data e hora atual formatadas no padrão brasileiro.
+ * @returns {string} Data e hora completas (ex: segunda-feira, 10 de novembro de 2025 às 15:30).
+ * @example
+ * const data = obterDataHoraAtual();
+ * console.log(data); // "segunda-feira, 10 de novembro de 2025 às 15:30"
+ */
 function obterDataHoraAtual() {
   const agora = new Date();
   const opcoes = {
@@ -44,14 +83,26 @@ function obterDataHoraAtual() {
   return agora.toLocaleDateString('pt-BR', opcoes);
 }
 
-// Requisição com tempo limite
+/**
+ * Realiza uma requisição HTTP com tempo limite configurável.
+ * Utiliza AbortController para cancelar requisições que excedem o tempo limite.
+ *
+ * @async
+ * @param {string} url - URL da requisição.
+ * @param {number} [timeout=TIMEOUT_MS] - Tempo máximo em milissegundos.
+ * @throws {Error} Lança erro 'TIMEOUT' se a resposta demorar demais.
+ * @returns {Promise<Response>} Resposta da requisição fetch.
+ * @example
+ * const resposta = await fetchComTimeout('https://api.open-meteo.com/v1/forecast');
+ */
 async function fetchComTimeout(url, timeout = TIMEOUT_MS) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
+
   try {
-    const response = await fetch(url, { signal: controller.signal });
+    const resposta = await fetch(url, { signal: controller.signal });
     clearTimeout(timeoutId);
-    return response;
+    return resposta;
   } catch (erro) {
     clearTimeout(timeoutId);
     if (erro.name === 'AbortError') throw new Error('TIMEOUT');
@@ -59,13 +110,26 @@ async function fetchComTimeout(url, timeout = TIMEOUT_MS) {
   }
 }
 
-// ==========================
-// REQUISIÇÕES À API
-// ==========================
+// =============================================================
+//  REQUISIÇÕES À API
+// =============================================================
 
-// Busca coordenadas (latitude/longitude) da cidade
+/**
+ * Busca as coordenadas (latitude e longitude) de uma cidade.
+ *
+ * @async
+ * @param {string} cidade - Nome da cidade.
+ * @returns {Promise<Object|null>} Objeto com latitude, longitude, nome e país, ou null se não encontrado.
+ * @throws {Error} Lança erro se houver falha na requisição.
+ * @example
+ * const coords = await buscarCoordenadas('São Paulo');
+ * console.log(coords.latitude, coords.longitude);
+ */
 async function buscarCoordenadas(cidade) {
-  const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cidade)}&count=1&language=pt&format=json`;
+  const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(
+    cidade
+  )}&count=1&language=pt&format=json`;
+
   const resposta = await fetchComTimeout(url);
   const dados = await resposta.json();
 
@@ -80,7 +144,16 @@ async function buscarCoordenadas(cidade) {
   };
 }
 
-// Busca dados climáticos atuais
+/**
+ * Busca os dados climáticos atuais com base nas coordenadas fornecidas.
+ *
+ * @async
+ * @param {Object} coordenadas - Objeto com latitude e longitude.
+ * @returns {Promise<Object>} Dados atuais de temperatura e código do clima.
+ * @example
+ * const dados = await buscarDadosClima({ latitude: -23.5, longitude: -46.6 });
+ * console.log(dados.temperature_2m);
+ */
 async function buscarDadosClima(coordenadas) {
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${coordenadas.latitude}&longitude=${coordenadas.longitude}&current=temperature_2m,weather_code&timezone=auto`;
   const resposta = await fetchComTimeout(url);
@@ -88,9 +161,22 @@ async function buscarDadosClima(coordenadas) {
   return dados.current;
 }
 
-// ==========================
-// FUNÇÃO PRINCIPAL
-// ==========================
+// =============================================================
+//  FUNÇÃO PRINCIPAL
+// =============================================================
+
+/**
+ * Função principal que busca e exibe as informações do clima.
+ * Valida entrada, obtém coordenadas, consulta clima e atualiza interface.
+ *
+ * @async
+ * @returns {Promise<void>}
+ * @fires mostrarErro - Quando há erro de validação ou requisição.
+ * @fires exibirClima - Quando os dados são carregados com sucesso.
+ * @example
+ * // Chamado ao clicar em "Buscar" ou pressionar Enter
+ * await buscarClima();
+ */
 async function buscarClima() {
   const cidade = cityInput.value.trim();
 
@@ -118,18 +204,25 @@ async function buscarClima() {
   }
 }
 
-// ==========================
-// FUNÇÃO DE EXIBIÇÃO DO CLIMA
-// ==========================
+// =============================================================
+//  EXIBIÇÃO DO CLIMA NA INTERFACE
+// =============================================================
+
+/**
+ * Exibe as informações meteorológicas na interface do usuário.
+ *
+ * @param {string} nome - Nome da cidade.
+ * @param {string} pais - Nome do país.
+ * @param {Object} dados - Dados meteorológicos retornados pela API.
+ * @returns {void}
+ */
 function exibirClima(nome, pais, dados) {
   esconderMensagens();
 
-  // Remove elementos antigos se existirem
-  if (description) description.remove();
-  if (weatherIcon) weatherIcon.remove();
-  if (currentDate) currentDate.remove();
+  description?.remove();
+  weatherIcon?.remove();
+  currentDate?.remove();
 
-  // Criação de novos elementos
   description = document.createElement('p');
   description.id = 'description';
 
@@ -141,199 +234,125 @@ function exibirClima(nome, pais, dados) {
   currentDate.id = 'currentDate';
   currentDate.textContent = obterDataHoraAtual();
 
-  // Atualiza os textos principais
   cityName.textContent = `${nome}, ${pais}`;
   temperature.textContent = `${Math.round(dados.temperature_2m)}°`;
 
-  // Define ícone e descrição
   const clima = obterDescricaoClima(dados.weather_code);
   weatherIcon.classList.add('wi', clima.icone);
   description.textContent = clima.descricao;
 
-  // Adiciona os novos elementos à tela
-  const infoContainer = document.querySelector('.weather-info');
-  infoContainer.appendChild(description);
-  infoContainer.appendChild(currentDate);
+  document.querySelector('.weather-info').append(description, currentDate);
+  document.querySelector('.weather-header').prepend(weatherIcon);
 
-  const headerContainer = document.querySelector('.weather-header');
-  headerContainer.prepend(weatherIcon);
-
-  // Aplica fundo dinâmico
   const horaAtual = new Date().getHours();
   definirFundoClima(dados.weather_code, horaAtual);
 
-  // Alterna as telas
   searchScreen.style.display = 'none';
   resultScreen.style.display = 'flex';
 }
 
-/// ==========================
-// TRADUÇÃO DE CÓDIGOS DE CLIMA (DIA E NOITE)
-// ==========================
+// =============================================================
+//  TRADUÇÃO DE CÓDIGOS DE CLIMA
+// =============================================================
+
+/**
+ * Retorna a descrição e o ícone apropriado com base no código climático e horário.
+ * @param {number} codigo - Código climático da API.
+ * @returns {{descricao: string, icone: string}} Objeto com descrição e ícone correspondente.
+ */
 function obterDescricaoClima(codigo) {
   const codigos = {
-    0: { 
-      descricao: 'Céu limpo', 
-      dia: 'wi-day-sunny', 
-      noite: 'wi-night-clear' 
-    },
-    1: { 
-      descricao: 'Principalmente limpo', 
-      dia: 'wi-day-sunny-overcast', 
-      noite: 'wi-night-alt-partly-cloudy' 
-    },
-    2: { 
-      descricao: 'Parcialmente nublado', 
-      dia: 'wi-day-cloudy', 
-      noite: 'wi-night-alt-cloudy' 
-    },
-    3: { 
-      descricao: 'Nublado', 
-      dia: 'wi-cloudy', 
-      noite: 'wi-night-alt-cloudy-high' 
-    },
-    45: { 
-      descricao: 'Neblina', 
-      dia: 'wi-fog', 
-      noite: 'wi-night-fog' 
-    },
-    48: { 
-      descricao: 'Nevoeiro', 
-      dia: 'wi-fog', 
-      noite: 'wi-night-fog' 
-    },
-    51: { 
-      descricao: 'Garoa leve', 
-      dia: 'wi-sprinkle', 
-      noite: 'wi-night-alt-sprinkle' 
-    },
-    53: { 
-      descricao: 'Garoa moderada', 
-      dia: 'wi-sprinkle', 
-      noite: 'wi-night-alt-sprinkle' 
-    },
-    55: { 
-      descricao: 'Garoa forte', 
-      dia: 'wi-showers', 
-      noite: 'wi-night-alt-showers' 
-    },
-    61: { 
-      descricao: 'Chuva leve', 
-      dia: 'wi-rain', 
-      noite: 'wi-night-alt-rain' 
-    },
-    63: { 
-      descricao: 'Chuva moderada', 
-      dia: 'wi-rain', 
-      noite: 'wi-night-alt-rain' 
-    },
-    65: { 
-      descricao: 'Chuva forte', 
-      dia: 'wi-rain-wind', 
-      noite: 'wi-night-alt-rain-wind' 
-    },
-    71: { 
-      descricao: 'Neve leve', 
-      dia: 'wi-snow', 
-      noite: 'wi-night-alt-snow' 
-    },
-    73: { 
-      descricao: 'Neve moderada', 
-      dia: 'wi-snow', 
-      noite: 'wi-night-alt-snow' 
-    },
-    75: { 
-      descricao: 'Neve forte', 
-      dia: 'wi-snow-wind', 
-      noite: 'wi-night-alt-snow-wind' 
-    },
-    80: { 
-      descricao: 'Pancadas de chuva', 
-      dia: 'wi-showers', 
-      noite: 'wi-night-alt-showers' 
-    },
-    81: { 
-      descricao: 'Pancadas moderadas', 
-      dia: 'wi-showers', 
-      noite: 'wi-night-alt-showers' 
-    },
-    82: { 
-      descricao: 'Pancadas fortes', 
-      dia: 'wi-rain-wind', 
-      noite: 'wi-night-alt-rain-wind' 
-    },
-    95: { 
-      descricao: 'Tempestade', 
-      dia: 'wi-thunderstorm', 
-      noite: 'wi-night-alt-thunderstorm' 
-    },
-    96: { 
-      descricao: 'Tempestade com granizo', 
-      dia: 'wi-storm-showers', 
-      noite: 'wi-night-alt-storm-showers' 
-    },
-    99: { 
-      descricao: 'Tempestade severa', 
-      dia: 'wi-hail', 
-      noite: 'wi-night-alt-hail' 
-    }
+    0: { descricao: 'Céu limpo', dia: 'wi-day-sunny', noite: 'wi-night-clear' },
+    1: { descricao: 'Principalmente limpo', dia: 'wi-day-sunny-overcast', noite: 'wi-night-alt-partly-cloudy' },
+    2: { descricao: 'Parcialmente nublado', dia: 'wi-day-cloudy', noite: 'wi-night-alt-cloudy' },
+    3: { descricao: 'Nublado', dia: 'wi-cloudy', noite: 'wi-night-alt-cloudy-high' },
+    45: { descricao: 'Neblina', dia: 'wi-fog', noite: 'wi-night-fog' },
+    48: { descricao: 'Nevoeiro', dia: 'wi-fog', noite: 'wi-night-fog' },
+    51: { descricao: 'Garoa leve', dia: 'wi-sprinkle', noite: 'wi-night-alt-sprinkle' },
+    53: { descricao: 'Garoa moderada', dia: 'wi-sprinkle', noite: 'wi-night-alt-sprinkle' },
+    55: { descricao: 'Garoa forte', dia: 'wi-showers', noite: 'wi-night-alt-showers' },
+    61: { descricao: 'Chuva leve', dia: 'wi-rain', noite: 'wi-night-alt-rain' },
+    63: { descricao: 'Chuva moderada', dia: 'wi-rain', noite: 'wi-night-alt-rain' },
+    65: { descricao: 'Chuva forte', dia: 'wi-rain-wind', noite: 'wi-night-alt-rain-wind' },
+    71: { descricao: 'Neve leve', dia: 'wi-snow', noite: 'wi-night-alt-snow' },
+    73: { descricao: 'Neve moderada', dia: 'wi-snow', noite: 'wi-night-alt-snow' },
+    75: { descricao: 'Neve forte', dia: 'wi-snow-wind', noite: 'wi-night-alt-snow-wind' },
+    80: { descricao: 'Pancadas de chuva', dia: 'wi-showers', noite: 'wi-night-alt-showers' },
+    81: { descricao: 'Pancadas moderadas', dia: 'wi-showers', noite: 'wi-night-alt-showers' },
+    82: { descricao: 'Pancadas fortes', dia: 'wi-rain-wind', noite: 'wi-night-alt-rain-wind' },
+    95: { descricao: 'Tempestade', dia: 'wi-thunderstorm', noite: 'wi-night-alt-thunderstorm' },
+    96: { descricao: 'Tempestade com granizo', dia: 'wi-storm-showers', noite: 'wi-night-alt-storm-showers' },
+    99: { descricao: 'Tempestade severa', dia: 'wi-hail', noite: 'wi-night-alt-hail' }
   };
 
-  // Verifica horário atual (para alternar entre ícone de dia e de noite)
   const hora = new Date().getHours();
   const isNoite = hora >= 18 || hora < 6;
-
   const clima = codigos[codigo] || { descricao: 'Clima desconhecido', dia: 'wi-na', noite: 'wi-na' };
   const icone = isNoite ? clima.noite : clima.dia;
 
   return { descricao: clima.descricao, icone };
 }
 
+// =============================================================
+//  TRATAMENTO DE ERROS E INTERFACE
+// =============================================================
 
-// ==========================
-// FUNÇÕES DE ERRO E INTERFACE
-// ==========================
+/**
+ * Trata diferentes tipos de erro e exibe mensagens apropriadas.
+ * @param {Error} erro - Objeto de erro capturado.
+ * @returns {void}
+ */
 function tratarErro(erro) {
   console.error('Erro:', erro);
   let mensagem = MENSAGENS_ERRO.GENERICO;
 
   if (erro.message === 'TIMEOUT') mensagem = MENSAGENS_ERRO.TIMEOUT;
-  else if (erro.message.includes('Failed to fetch') || erro.message.includes('Network'))
-    mensagem = MENSAGENS_ERRO.REDE;
-  else if (erro.message.includes('500') || erro.message.includes('502') || erro.message.includes('503'))
-    mensagem = MENSAGENS_ERRO.SERVIDOR;
+  else if (erro.message.includes('Network')) mensagem = MENSAGENS_ERRO.REDE;
+  else if (erro.message.includes('500') || erro.message.includes('503')) mensagem = MENSAGENS_ERRO.SERVIDOR;
 
   mostrarErro(mensagem);
 }
 
-function mostrarCarregamento() {
-  loading.style.display = 'block';
-}
-
-function esconderCarregamento() {
-  loading.style.display = 'none';
-}
-
-function esconderMensagens() {
-  loading.style.display = 'none';
-  const erro = document.getElementById('error');
-  if (erro) erro.remove();
-}
-
+/**
+ * Exibe mensagem de erro na interface.
+ * @param {string} mensagem - Texto da mensagem.
+ * @returns {void}
+ */
 function mostrarErro(mensagem) {
   esconderMensagens();
   const erro = document.createElement('p');
   erro.id = 'error';
   erro.textContent = mensagem;
-  erro.style.color = 'red';
-  erro.style.fontSize = '0.95rem';
-  erro.style.marginTop = '0.75rem';
+  erro.classList.add('erro-mensagem');
   searchScreen.appendChild(erro);
 }
 
-// ==========================
-// FUNÇÕES DE FUNDO DINÂMICO
-// ==========================
+/** Exibe o indicador de carregamento. */
+function mostrarCarregamento() {
+  loading.style.display = 'block';
+}
+
+/** Esconde o indicador de carregamento. */
+function esconderCarregamento() {
+  loading.style.display = 'none';
+}
+
+/** Remove mensagens de erro ou carregamento. */
+function esconderMensagens() {
+  loading.style.display = 'none';
+  document.getElementById('error')?.remove();
+}
+
+// =============================================================
+//  FUNDO DINÂMICO (POR CLIMA E HORÁRIO)
+// =============================================================
+
+/**
+ * Define dinamicamente o fundo da aplicação com base no clima e horário.
+ * @param {number} weatherCode - Código climático.
+ * @param {number} hora - Hora atual.
+ * @returns {void}
+ */
 function definirFundoClima(weatherCode, hora) {
   let bg;
   const isDia = hora >= 6 && hora < 17;
@@ -348,26 +367,26 @@ function definirFundoClima(weatherCode, hora) {
     bg = isDia
       ? "linear-gradient(to bottom, #6dd5fa, #b3e5fc)"
       : isPorDoSol
-      ? "linear-gradient(to bottom, #ff9a9e, #fad0c4, #fbc2eb)"
-      : "linear-gradient(to bottom, #2c3e50, #4b79a1, #283e51)";
+      ? "linear-gradient(to bottom, #BFE8FF, #FAACDA, #FC7617)"
+      : "linear-gradient(to bottom, #000624, #02184D, #497499)";
   } else if (parcialmenteNublado.includes(weatherCode)) {
     bg = isDia
-      ? "linear-gradient(to bottom, #8ec5fc, #e0c3fc)"
+      ? "linear-gradient(to bottom, #A3DBF7, #A6CAE0)"
       : isPorDoSol
-      ? "linear-gradient(to bottom, #fbc2eb, #a6c1ee)"
-      : "linear-gradient(to bottom, #4e54c8, #8f94fb)";
+      ? "linear-gradient(to bottom, #84A4BD, #D67C22, #D14217)"
+      : "linear-gradient(to bottom, #020024, #415F94)";
   } else if (nublado.includes(weatherCode)) {
     bg = isDia
       ? "linear-gradient(to bottom, #a1c4fd, #c2e9fb)"
       : isPorDoSol
-      ? "linear-gradient(to bottom, #d7d2cc, #304352)"
-      : "linear-gradient(to bottom, #283e51, #485563)";
+      ? "linear-gradient(to bottom, #AB9C7B, #8A5C4D, #AD5C34)"
+      : "linear-gradient(to bottom, #020024, #485B75)";
   } else if (chuvoso.includes(weatherCode)) {
     bg = isDia
-      ? "linear-gradient(to bottom, #4e73b5, #8eaecf)"
+      ? "linear-gradient(to bottom, #3D4D6E, #5F81AD)"
       : isPorDoSol
-      ? "linear-gradient(to bottom, #3a6186, #89253e)"
-      : "linear-gradient(to bottom, #1e3c72, #2a5298)";
+      ? "linear-gradient(to bottom, #39445E, #596B8F, #B06E4D)"
+      : "linear-gradient(to bottom, #1D243B, #2E4063)";
   } else {
     bg = "linear-gradient(to bottom, #88d6fa, #b3e5fc)";
   }
@@ -377,13 +396,17 @@ function definirFundoClima(weatherCode, hora) {
   document.body.style.backgroundSize = "200% 200%";
 }
 
-// ==========================
+// =============================================================
 // EVENTOS
-// ==========================
+// =============================================================
+
+/** Evento: executa busca ao clicar no botão. */
 searchBtn.addEventListener('click', buscarClima);
-cityInput.addEventListener('keypress', e => {
-  if (e.key === 'Enter') buscarClima();
-});
+
+/** Evento: executa busca ao pressionar Enter. */
+cityInput.addEventListener('keypress', (e) => e.key === 'Enter' && buscarClima());
+
+/** Evento: retorna à tela inicial ao clicar em "voltar". */
 backBtn.addEventListener('click', () => {
   cityInput.value = '';
   esconderMensagens();
@@ -393,9 +416,11 @@ backBtn.addEventListener('click', () => {
   searchScreen.style.display = 'flex';
 });
 
-// ==========================
-// INICIALIZAÇÃO
-// ==========================
+// =============================================================
+//  INICIALIZAÇÃO AUTOMÁTICA
+// =============================================================
+
+/** Aplica o fundo dinâmico automaticamente ao carregar a página. */
 window.addEventListener('load', () => {
   const horaAtual = new Date().getHours();
   definirFundoClima(0, horaAtual);
