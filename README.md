@@ -24,21 +24,20 @@ git clone https://github.com/Rayssa-Ferraz/projeto_clima.git
 
 2. 🗂️ Estrutura do projeto:
 
-PROJETO_CLIMA/
+📁 PROJETO_CLIMA/
 │
-├── index.html                  # Página principal do aplicativo
+├── 📄 index.html          # Página principal do portfólio
 │
-├── assets/
-│   ├── css/
-│   │   └── styles.css          # Folha de estilos principal (design e responsividade)
-│   │
-│   ├── js/
-│   │   └── api.js              # Lógica principal e integração com as APIs Open-Meteo
-│   │
-│   └── images/                 # Ícones e imagens ilustrativas
+└── 📁 assets/
+│        ├── 📁 css/
+│        │      └── styles.css      # Folha de estilos principal
+│        ├── 📁 js/
+│        │       └── api.js            # Lógica principal e integração com as APIs Open-Meteo
+│        ├── 📁 img/            # Imagens e ícones utilizados
 │
-├── tests/
-│   └── api.test.js             # Testes unitários com Jest
+├── 📁 tests/        
+│       └── api.test.js        # Testes unitários com Jest
+
 
 3. Abra o arquivo index.html diretamente no navegador.
     Nenhum servidor é necessário — a aplicação roda totalmente no cliente.
