@@ -2,7 +2,7 @@
 
 
 
-Aplicativo interativo que permite consultar as condições climáticas em tempo real de qualquer cidade do mundo. 🌎<br>
+Aplicativo interativo que permite consultar as condições climáticas em tempo real de qualquer cidade do mundo. <br>
 Desenvolvido com <b>HTML, CSS e JavaScript puro</b>, o sistema consome as APIs da <b>Open-Meteo</b> para exibir temperatura, descrição do clima e ícone dinâmico, além de ajustar automaticamente o fundo da tela conforme o horário (dia, pôr do sol ou noite).<br><br>
 Conta também com tratamento de erros (rede, cidade inexistente, timeout), mensagens informativas e uma experiência fluida e responsiva — tudo em uma interface moderna e intuitiva.
 
