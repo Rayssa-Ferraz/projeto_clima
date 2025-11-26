@@ -1,11 +1,11 @@
 /**
  * @fileoverview Aplicativo de Previsão do Tempo 
- * @description Sistema web que consulta e exibe dados meteorológicos em tempo real,
- * utilizando as APIs Open-Meteo (Geocoding e Weather) para buscar informações climáticas
- * de cidades ao redor do mundo.
+ * @description Sistema web que consulta e exibe dados meteorológicos em tempo real.
+ * Versão com segurança aprimorada — proteção leve contra XSS e entradas perigosas,
+ * sem alterar o comportamento original da aplicação.
  *
  * @author Rayssa Ferraz
- * @version 1.1.0
+ * @version 1.2.0 - Segurança Leve
  * @license MIT
  */
 
@@ -24,6 +24,26 @@ const backBtn = document.getElementById('backBtn');
 
 let description, weatherIcon, currentDate;
 
+
+// =============================================================
+//  SEGURANÇA — Sanitização Simples
+//  (não altera comportamento, só remove caracteres perigosos)
+// =============================================================
+
+function sanitizarTexto(texto) {
+  if (!texto) return "";
+  return texto
+    .replace(/[<>"'`{}()[\]\\]/g, "") // remove caracteres perigosos
+    .trim();
+}
+
+function entradaValida(texto) {
+  if (!texto) return false;
+  const proibidos = /[<>"'`{}()[\]\\]/;
+  return !proibidos.test(texto);
+}
+
+
 // =============================================================
 //  CONSTANTES
 // =============================================================
@@ -38,6 +58,7 @@ const MENSAGENS_ERRO = {
   SERVIDOR: 'Erro no servidor. Tente novamente mais tarde.',
   GENERICO: 'Erro ao buscar dados. Tente novamente.'
 };
+
 
 // =============================================================
 //  FUNÇÕES AUXILIARES
@@ -71,11 +92,15 @@ async function fetchComTimeout(url, timeout = TIMEOUT_MS) {
   }
 }
 
+
 // =============================================================
 //  REQUISIÇÕES À API
 // =============================================================
 
 async function buscarCoordenadas(cidade) {
+  // segurança leve
+  cidade = sanitizarTexto(cidade);
+
   const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(
     cidade
   )}&count=1&language=pt&format=json`;
@@ -89,8 +114,8 @@ async function buscarCoordenadas(cidade) {
   return {
     latitude: r.latitude,
     longitude: r.longitude,
-    nome: r.name,
-    pais: r.country
+    nome: sanitizarTexto(r.name),
+    pais: sanitizarTexto(r.country)
   };
 }
 
@@ -101,34 +126,44 @@ async function buscarDadosClima(coordenadas) {
   return dados.current;
 }
 
-/**
- * NOVA FUNÇÃO PARA PREVISÃO DE 5 DIAS
- */
 async function buscarPrevisao5Dias(coordenadas) {
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${coordenadas.latitude}&longitude=${coordenadas.longitude}&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=auto`;
 
   const resposta = await fetchComTimeout(url);
   const dados = await resposta.json();
 
-  return dados.daily.time.map((data, i) => ({
+  // 🔥 Remove o dia de hoje (index 0)
+  const previsoes = dados.daily.time.map((data, i) => ({
     data,
     tempMax: dados.daily.temperature_2m_max[i],
     tempMin: dados.daily.temperature_2m_min[i],
     codigo: dados.daily.weather_code[i]
-  })).slice(1, 5);
+  }));
+
+  return previsoes.slice(1, 6); // pega só os próximos 4 dias
 }
+
+
 
 // =============================================================
 //  BUSCA PRINCIPAL
 // =============================================================
 
 async function buscarClima() {
-  const cidade = cityInput.value.trim();
+  const cidadeBruta = cityInput.value.trim();
 
-  if (!cidade) {
+  if (!cidadeBruta) {
     mostrarErro(MENSAGENS_ERRO.CIDADE_VAZIA);
     return;
   }
+
+  // segurança leve sem quebrar a lógica
+  if (!entradaValida(cidadeBruta)) {
+    mostrarErro("Entrada inválida. Remova caracteres especiais.");
+    return;
+  }
+
+  const cidade = sanitizarTexto(cidadeBruta);
 
   esconderMensagens();
   mostrarCarregamento();
@@ -152,6 +187,7 @@ async function buscarClima() {
     esconderCarregamento();
   }
 }
+
 
 // =============================================================
 //  EXIBIÇÃO DO CLIMA ATUAL
@@ -190,7 +226,10 @@ function exibirClima(nome, pais, dados) {
 
   searchScreen.style.display = 'none';
   resultScreen.style.display = 'flex';
+
+  document.body.classList.add("showing-result");
 }
+
 
 // =============================================================
 //  EXIBIÇÃO DA PREVISÃO DE 5 DIAS
@@ -202,7 +241,8 @@ function exibirPrevisaoDias(dias) {
 
   container.innerHTML = "";
 
-  dias.forEach(dia => {
+  dias.slice(1, 6).forEach(dia => {
+
     const dataObj = new Date(dia.data);
 
     const nomeDia = dataObj.toLocaleDateString("pt-BR", { weekday: "long" });
@@ -231,6 +271,7 @@ function exibirPrevisaoDias(dias) {
     container.appendChild(item);
   });
 }
+
 
 // =============================================================
 //  TRADUÇÃO DE CÓDIGOS
@@ -269,6 +310,7 @@ function obterDescricaoClima(codigo) {
   return { descricao: clima.descricao, icone };
 }
 
+
 // =============================================================
 //  TRATAMENTO DE ERROS
 // =============================================================
@@ -293,6 +335,7 @@ function mostrarErro(mensagem) {
   searchScreen.appendChild(erro);
 }
 
+
 // =============================================================
 //  INTERFACE
 // =============================================================
@@ -309,6 +352,7 @@ function esconderMensagens() {
   loading.style.display = 'none';
   document.getElementById('error')?.remove();
 }
+
 
 // =============================================================
 //  FUNDO DINÂMICO
@@ -357,12 +401,12 @@ function definirFundoClima(weatherCode, hora) {
   document.body.style.backgroundSize = "200% 200%";
 }
 
+
 // =============================================================
 //  EVENTOS
 // =============================================================
 
 searchBtn.addEventListener('click', buscarClima);
-
 cityInput.addEventListener('keypress', (e) => e.key === 'Enter' && buscarClima());
 
 backBtn.addEventListener('click', () => {
@@ -372,7 +416,9 @@ backBtn.addEventListener('click', () => {
   definirFundoClima(0, horaAtual);
   resultScreen.style.display = 'none';
   searchScreen.style.display = 'flex';
+  document.body.classList.remove("showing-result");
 });
+
 
 // =============================================================
 //  INICIALIZAÇÃO

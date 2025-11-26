@@ -3,27 +3,63 @@
 
 <head>
     <meta charset="UTF-8" />
+
+    <!-- ================================ -->
+    <!-- 🔒 SECURITY HEADERS - OBRIGATÓRIO -->
+    <!-- ================================ -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline';
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
+        font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:;
+        img-src 'self' data: https:;
+        connect-src 'self' https://geocoding-api.open-meteo.com https://api.open-meteo.com https://cdnjs.cloudflare.com;
+        base-uri 'self';
+        form-action 'self';
+    ">
+
+    <!-- Controle de referência segura -->
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- VIEWPORT E METADADOS -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Aplicativo de Previsão do Tempo - Rayssa Ferraz" />
+    <meta name="description" content="Aplicativo de Previsão do Tempo com Segurança Aprimorada - Rayssa Ferraz" />
     <meta name="author" content="Rayssa Ferraz" />
-    <title>Previsão do Tempo</title>
+    <meta name="theme-color" content="#87CEEB">
 
-    <!-- Fonte -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
+    <title>Previsão do Tempo - Seguro e Confiável</title>
 
-    <!-- Ícones meteorológicos -->
+    <!-- ================================= -->
+    <!-- 🔗 PRECONNECT PARA PERFORMANCE     -->
+    <!-- ================================= -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://geocoding-api.open-meteo.com">
+    <link rel="preconnect" href="https://api.open-meteo.com">
+
+    <!-- ================================ -->
+    <!-- ✨ FONTES GOOGLE                  -->
+    <!-- ================================ -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" crossorigin="anonymous">
+
+    <!-- ========================================== -->
+    <!-- ☁️ WEATHER ICONS COM SRI (SEGURANÇA EXTRA) -->
+    <!-- ========================================== -->
     <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/weather-icons/2.0.12/css/weather-icons.min.css"
-    />
+        integrity="sha512-r/Gan7PMSRovDus++vDS2Ayutc/cSdl268u047n4z+k7GYuR7Hiw71FsT3QQxdKJBVHYttOJ6IGLnlM9IoMToQ=="
+        crossorigin="anonymous"
+    >
 
-    <!-- CSS -->
+    <!-- ================================ -->
+    <!-- 🎨 SEU CSS                        -->
+    <!-- ================================ -->
     <link rel="stylesheet" href="./assets/css/styles.css" />
 </head>
 
 <body>
+
     <div class="container">
 
         <!-- 🌦️ TELA DE BUSCA -->
@@ -37,12 +73,19 @@
             <h1>Previsão do Tempo</h1>
 
             <div class="search-area">
-                <input type="text" id="cityInput" placeholder="Digite o nome da cidade" />
-                <button id="searchBtn">Buscar</button>
+                <input 
+                    type="text" 
+                    id="cityInput" 
+                    placeholder="Digite o nome da cidade"
+                    maxlength="100"
+                    autocomplete="off"
+                    aria-label="Nome da cidade"
+                />
+                <button id="searchBtn" aria-label="Buscar previsão do tempo">Buscar</button>
             </div>
 
-            <div id="loading">Carregando...</div>
-            <div id="error"></div>
+            <div id="loading" aria-live="polite">Carregando...</div>
+            <div id="error" role="alert"></div>
         </div>
 
         <!-- 🌤️ TELA DE RESULTADO -->
@@ -73,7 +116,20 @@
         </div>
     </div>
 
-    <!-- JS -->
+    <!-- 🔒 AVISO DE PRIVACIDADE — RODAPÉ -->
+    <footer class="privacy-footer">
+        <p>🔒 Esta aplicação não coleta, armazena ou compartilha dados pessoais. As buscas são processadas em tempo real e não são registradas.</p>
+        <p>🌦️ Dados meteorológicos fornecidos por 
+            <a href="https://open-meteo.com/" target="_blank">Open-Meteo.com</a> 
+            sob licença 
+            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>.
+        </p>
+    </footer>
+
+    <!-- ================================ -->
+    <!-- 📌 JAVASCRIPT                    -->
+    <!-- ================================ -->
     <script src="./assets/js/api.js"></script>
+
 </body>
 </html>

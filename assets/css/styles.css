@@ -520,6 +520,91 @@ body.night-mode .temp .max {
   text-align: center;
 }
 
+.privacy-info {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #2c3e50;
+    opacity: 0.9;
+    line-height: 1.4;
+}
+
+.privacy-info a {
+    color: #245b9e;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.privacy-info a:hover {
+    text-decoration: underline;
+}
+.privacy-footer {
+    position: fixed;
+    bottom: 10px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #ffffff;
+    line-height: 1.4;
+    opacity: 0.9;
+    padding-bottom: 5px;
+}
+
+.privacy-footer a {
+    color: #ffffff;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.privacy-footer a:hover {
+    text-decoration: underline;
+}
+
+/* ===== AJUSTE EXCLUSIVO DO CARD DE RESULTADO ===== */
+
+body.showing-result .container {
+  max-width: 24rem;        /* card mais estreito */
+  padding: 2rem 1.5rem;    /* menos espaço interno */
+}
+
+/* Deixa o cabeçalho menos alto */
+body.showing-result .weather-header {
+  padding: 1.5rem 1rem;
+}
+
+/* Ajusta o título da cidade e descrição para ficarem proporcionais */
+body.showing-result #cityName {
+  font-size: 1.5rem;
+}
+
+body.showing-result #description {
+  font-size: 1rem;
+}
+
+body.showing-result #currentDate {
+  font-size: 0.85rem;
+}
+
+/* Forecast menor */
+body.showing-result .forecast-container {
+  max-width: 18rem;
+  padding: 1rem;
+  border-radius: 1rem;
+}
+body.showing-result .container {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
+/* Subir o bloco da previsão */
+body.showing-result .forecast-container {
+    margin-top: -1.75rem;   /* sobe um pouquinho */
+}
+/* Subir a casinha */
+body.showing-result #backBtn {
+    margin-top: -2rem;   /* aumenta o espaço entre previsão e botão */
+    margin-bottom: -1rem; /* PUXA o botão para cima */
+}
 
 
 /* ===== RESPONSIVIDADE ===== */
