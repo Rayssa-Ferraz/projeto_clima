@@ -1,7 +1,9 @@
 # 🌤 Aplicativo de Previsão do Tempo
 <br /> <div align="center"> <img src="https://imgur.com/q6ZRYV4.png" title="Prévia da Aplicação" /> </div> <br />
 <div align="center"> <img src="https://img.shields.io/github/repo-size/Rayssa-Ferraz/projeto_clima?style=flat-square" /> <img src="https://img.shields.io/badge/HTML-5-orange.svg" /> <img src="https://img.shields.io/badge/CSS-3-purple.svg" /> <img src="https://img.shields.io/badge/JavaScript-ES6+-yellow.svg" /> <img src="https://img.shields.io/github/last-commit/Rayssa-Ferraz/projeto_clima?style=flat-square" /> <img src="https://img.shields.io/github/issues/Rayssa-Ferraz/projeto_clima?style=flat-square" /> <img src="https://img.shields.io/github/issues-pr/Rayssa-Ferraz/projeto_clima?style=flat-square" /> <img src="https://img.shields.io/badge/License-MIT-blue.svg"> </div>
+
 <br />
+
 ## 1. Descrição
 
 Aplicativo interativo que permite consultar as condições climáticas em tempo real de qualquer cidade do mundo, exibindo a previsão do dia atual e dos próximos 4 dias. <br>
@@ -11,6 +13,7 @@ Conta também com tratamento de erros (rede, cidade inexistente, timeout),  test
 
 
 <br />
+
 ## 2. Funcionalidades
 
 🔎 Busca inteligente de cidades
@@ -28,6 +31,7 @@ Conta também com tratamento de erros (rede, cidade inexistente, timeout),  test
 🧪 Testes com Jest
 
 <br />
+
 ## 3. 🧩 Tecnologias Utilizadas
 ### 3.1 Frontend
 
@@ -231,5 +235,3 @@ Este projeto está sob a Licença MIT.
 📧 Para dúvidas, sugestões ou colaborações, entre em contato:
 **rayssa_nana@hotmail.com**  
 🌎 [Meu Site](https://rayssa-ferraz.github.io/PORTFOLIO)
-
-
