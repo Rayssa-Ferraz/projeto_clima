@@ -25,6 +25,7 @@
 
 <body>
     <div class="container">
+
         <!-- 🌦️ TELA DE BUSCA -->
         <div id="searchScreen">
             <div class="weather-icons">
@@ -36,11 +37,7 @@
             <h1>Previsão do Tempo</h1>
 
             <div class="search-area">
-                <input
-                    type="text"
-                    id="cityInput"
-                    placeholder="Digite o nome da cidade"
-                />
+                <input type="text" id="cityInput" placeholder="Digite o nome da cidade" />
                 <button id="searchBtn">Buscar</button>
             </div>
 
@@ -50,6 +47,7 @@
 
         <!-- 🌤️ TELA DE RESULTADO -->
         <div id="resultScreen">
+
             <!-- Cabeçalho com ícone e temperatura -->
             <div class="weather-header">
                 <i class="weather-icon" id="weatherIcon"></i>
@@ -63,10 +61,15 @@
                 <p id="currentDate"></p>
             </div>
 
+            <!-- 🌦️ Previsão dos próximos dias -->
+            <h3 class="forecast-title">Próximos Dias</h3>
+            <div id="forecastContainer" class="forecast-container"></div>
+
             <!-- Botão de voltar -->
             <button id="backBtn" title="Voltar ao início">
                 <img src="./assets/img/home.png" alt="Voltar" />
             </button>
+
         </div>
     </div>
 

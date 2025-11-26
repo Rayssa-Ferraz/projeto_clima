@@ -5,7 +5,7 @@
  * de cidades ao redor do mundo.
  *
  * @author Rayssa Ferraz
- * @version 1.0.0
+ * @version 1.1.0
  * @license MIT
  */
 
@@ -13,10 +13,6 @@
 //  SELEÇÃO DE ELEMENTOS DO DOM
 // =============================================================
 
-/**
- * Elementos HTML manipulados pela aplicação.
- * @type {HTMLElement}
- */
 const cityInput = document.getElementById('cityInput');
 const searchBtn = document.getElementById('searchBtn');
 const loading = document.getElementById('loading');
@@ -26,30 +22,14 @@ const temperature = document.getElementById('temperature');
 const cityName = document.getElementById('cityName');
 const backBtn = document.getElementById('backBtn');
 
-// Elementos criados dinamicamente
 let description, weatherIcon, currentDate;
 
 // =============================================================
-//  CONSTANTES E CONFIGURAÇÕES
+//  CONSTANTES
 // =============================================================
 
-/**
- * Tempo máximo de espera por resposta da API (em milissegundos).
- * @constant {number}
- * @default 10000
- */
 const TIMEOUT_MS = 10000;
 
-/**
- * Mensagens de erro padronizadas utilizadas em diferentes cenários.
- * @constant {Object.<string, string>}
- * @property {string} CIDADE_VAZIA - Quando o campo de busca está vazio.
- * @property {string} CIDADE_NAO_ENCONTRADA - Quando a cidade não é localizada.
- * @property {string} TIMEOUT - Quando a requisição excede o tempo limite.
- * @property {string} REDE - Quando ocorre erro de conexão.
- * @property {string} SERVIDOR - Quando ocorre falha no servidor.
- * @property {string} GENERICO - Quando o erro é genérico.
- */
 const MENSAGENS_ERRO = {
   CIDADE_VAZIA: 'Por favor, digite o nome de uma cidade.',
   CIDADE_NAO_ENCONTRADA: 'Cidade não encontrada. Tente novamente.',
@@ -63,13 +43,6 @@ const MENSAGENS_ERRO = {
 //  FUNÇÕES AUXILIARES
 // =============================================================
 
-/**
- * Retorna a data e hora atual formatadas no padrão brasileiro.
- * @returns {string} Data e hora completas (ex: segunda-feira, 10 de novembro de 2025 às 15:30).
- * @example
- * const data = obterDataHoraAtual();
- * console.log(data); // "segunda-feira, 10 de novembro de 2025 às 15:30"
- */
 function obterDataHoraAtual() {
   const agora = new Date();
   const opcoes = {
@@ -83,18 +56,6 @@ function obterDataHoraAtual() {
   return agora.toLocaleDateString('pt-BR', opcoes);
 }
 
-/**
- * Realiza uma requisição HTTP com tempo limite configurável.
- * Utiliza AbortController para cancelar requisições que excedem o tempo limite.
- *
- * @async
- * @param {string} url - URL da requisição.
- * @param {number} [timeout=TIMEOUT_MS] - Tempo máximo em milissegundos.
- * @throws {Error} Lança erro 'TIMEOUT' se a resposta demorar demais.
- * @returns {Promise<Response>} Resposta da requisição fetch.
- * @example
- * const resposta = await fetchComTimeout('https://api.open-meteo.com/v1/forecast');
- */
 async function fetchComTimeout(url, timeout = TIMEOUT_MS) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
@@ -114,17 +75,6 @@ async function fetchComTimeout(url, timeout = TIMEOUT_MS) {
 //  REQUISIÇÕES À API
 // =============================================================
 
-/**
- * Busca as coordenadas (latitude e longitude) de uma cidade.
- *
- * @async
- * @param {string} cidade - Nome da cidade.
- * @returns {Promise<Object|null>} Objeto com latitude, longitude, nome e país, ou null se não encontrado.
- * @throws {Error} Lança erro se houver falha na requisição.
- * @example
- * const coords = await buscarCoordenadas('São Paulo');
- * console.log(coords.latitude, coords.longitude);
- */
 async function buscarCoordenadas(cidade) {
   const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(
     cidade
@@ -135,25 +85,15 @@ async function buscarCoordenadas(cidade) {
 
   if (!dados.results || dados.results.length === 0) return null;
 
-  const resultado = dados.results[0];
+  const r = dados.results[0];
   return {
-    latitude: resultado.latitude,
-    longitude: resultado.longitude,
-    nome: resultado.name,
-    pais: resultado.country
+    latitude: r.latitude,
+    longitude: r.longitude,
+    nome: r.name,
+    pais: r.country
   };
 }
 
-/**
- * Busca os dados climáticos atuais com base nas coordenadas fornecidas.
- *
- * @async
- * @param {Object} coordenadas - Objeto com latitude e longitude.
- * @returns {Promise<Object>} Dados atuais de temperatura e código do clima.
- * @example
- * const dados = await buscarDadosClima({ latitude: -23.5, longitude: -46.6 });
- * console.log(dados.temperature_2m);
- */
 async function buscarDadosClima(coordenadas) {
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${coordenadas.latitude}&longitude=${coordenadas.longitude}&current=temperature_2m,weather_code&timezone=auto`;
   const resposta = await fetchComTimeout(url);
@@ -161,22 +101,27 @@ async function buscarDadosClima(coordenadas) {
   return dados.current;
 }
 
+/**
+ * NOVA FUNÇÃO PARA PREVISÃO DE 5 DIAS
+ */
+async function buscarPrevisao5Dias(coordenadas) {
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${coordenadas.latitude}&longitude=${coordenadas.longitude}&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=auto`;
+
+  const resposta = await fetchComTimeout(url);
+  const dados = await resposta.json();
+
+  return dados.daily.time.map((data, i) => ({
+    data,
+    tempMax: dados.daily.temperature_2m_max[i],
+    tempMin: dados.daily.temperature_2m_min[i],
+    codigo: dados.daily.weather_code[i]
+  })).slice(1, 5);
+}
+
 // =============================================================
-//  FUNÇÃO PRINCIPAL
+//  BUSCA PRINCIPAL
 // =============================================================
 
-/**
- * Função principal que busca e exibe as informações do clima.
- * Valida entrada, obtém coordenadas, consulta clima e atualiza interface.
- *
- * @async
- * @returns {Promise<void>}
- * @fires mostrarErro - Quando há erro de validação ou requisição.
- * @fires exibirClima - Quando os dados são carregados com sucesso.
- * @example
- * // Chamado ao clicar em "Buscar" ou pressionar Enter
- * await buscarClima();
- */
 async function buscarClima() {
   const cidade = cityInput.value.trim();
 
@@ -196,7 +141,11 @@ async function buscarClima() {
     }
 
     const dadosClima = await buscarDadosClima(coordenadas);
+    const previsaoProxDias = await buscarPrevisao5Dias(coordenadas);
+
     exibirClima(coordenadas.nome, coordenadas.pais, dadosClima);
+    exibirPrevisaoDias(previsaoProxDias);
+
   } catch (erro) {
     tratarErro(erro);
   } finally {
@@ -205,17 +154,9 @@ async function buscarClima() {
 }
 
 // =============================================================
-//  EXIBIÇÃO DO CLIMA NA INTERFACE
+//  EXIBIÇÃO DO CLIMA ATUAL
 // =============================================================
 
-/**
- * Exibe as informações meteorológicas na interface do usuário.
- *
- * @param {string} nome - Nome da cidade.
- * @param {string} pais - Nome do país.
- * @param {Object} dados - Dados meteorológicos retornados pela API.
- * @returns {void}
- */
 function exibirClima(nome, pais, dados) {
   esconderMensagens();
 
@@ -252,14 +193,49 @@ function exibirClima(nome, pais, dados) {
 }
 
 // =============================================================
-//  TRADUÇÃO DE CÓDIGOS DE CLIMA
+//  EXIBIÇÃO DA PREVISÃO DE 5 DIAS
 // =============================================================
 
-/**
- * Retorna a descrição e o ícone apropriado com base no código climático e horário.
- * @param {number} codigo - Código climático da API.
- * @returns {{descricao: string, icone: string}} Objeto com descrição e ícone correspondente.
- */
+function exibirPrevisaoDias(dias) {
+  const container = document.getElementById("forecastContainer");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  dias.forEach(dia => {
+    const dataObj = new Date(dia.data);
+
+    const nomeDia = dataObj.toLocaleDateString("pt-BR", { weekday: "long" });
+    const dataFormatada = dataObj.toLocaleDateString("pt-BR");
+
+    const clima = obterDescricaoClima(dia.codigo);
+
+    const item = document.createElement("div");
+    item.classList.add("forecast-item");
+
+    item.innerHTML = `
+      <div class="forecast-day">
+        <strong>${nomeDia}</strong>
+        <p>${dataFormatada}</p>
+      </div>
+
+      <div class="forecast-info">
+        <i class="wi ${clima.icone}"></i>
+        <p class="temp">
+          <span class="max">${dia.tempMax}°</span> /
+          <span class="min">${dia.tempMin}°</span>
+        </p>
+      </div>
+    `;
+
+    container.appendChild(item);
+  });
+}
+
+// =============================================================
+//  TRADUÇÃO DE CÓDIGOS
+// =============================================================
+
 function obterDescricaoClima(codigo) {
   const codigos = {
     0: { descricao: 'Céu limpo', dia: 'wi-day-sunny', noite: 'wi-night-clear' },
@@ -294,14 +270,9 @@ function obterDescricaoClima(codigo) {
 }
 
 // =============================================================
-//  TRATAMENTO DE ERROS E INTERFACE
+//  TRATAMENTO DE ERROS
 // =============================================================
 
-/**
- * Trata diferentes tipos de erro e exibe mensagens apropriadas.
- * @param {Error} erro - Objeto de erro capturado.
- * @returns {void}
- */
 function tratarErro(erro) {
   console.error('Erro:', erro);
   let mensagem = MENSAGENS_ERRO.GENERICO;
@@ -313,11 +284,6 @@ function tratarErro(erro) {
   mostrarErro(mensagem);
 }
 
-/**
- * Exibe mensagem de erro na interface.
- * @param {string} mensagem - Texto da mensagem.
- * @returns {void}
- */
 function mostrarErro(mensagem) {
   esconderMensagens();
   const erro = document.createElement('p');
@@ -327,32 +293,27 @@ function mostrarErro(mensagem) {
   searchScreen.appendChild(erro);
 }
 
-/** Exibe o indicador de carregamento. */
+// =============================================================
+//  INTERFACE
+// =============================================================
+
 function mostrarCarregamento() {
   loading.style.display = 'block';
 }
 
-/** Esconde o indicador de carregamento. */
 function esconderCarregamento() {
   loading.style.display = 'none';
 }
 
-/** Remove mensagens de erro ou carregamento. */
 function esconderMensagens() {
   loading.style.display = 'none';
   document.getElementById('error')?.remove();
 }
 
 // =============================================================
-//  FUNDO DINÂMICO (POR CLIMA E HORÁRIO)
+//  FUNDO DINÂMICO
 // =============================================================
 
-/**
- * Define dinamicamente o fundo da aplicação com base no clima e horário.
- * @param {number} weatherCode - Código climático.
- * @param {number} hora - Hora atual.
- * @returns {void}
- */
 function definirFundoClima(weatherCode, hora) {
   let bg;
   const isDia = hora >= 6 && hora < 17;
@@ -397,16 +358,13 @@ function definirFundoClima(weatherCode, hora) {
 }
 
 // =============================================================
-// EVENTOS
+//  EVENTOS
 // =============================================================
 
-/** Evento: executa busca ao clicar no botão. */
 searchBtn.addEventListener('click', buscarClima);
 
-/** Evento: executa busca ao pressionar Enter. */
 cityInput.addEventListener('keypress', (e) => e.key === 'Enter' && buscarClima());
 
-/** Evento: retorna à tela inicial ao clicar em "voltar". */
 backBtn.addEventListener('click', () => {
   cityInput.value = '';
   esconderMensagens();
@@ -417,10 +375,9 @@ backBtn.addEventListener('click', () => {
 });
 
 // =============================================================
-//  INICIALIZAÇÃO AUTOMÁTICA
+//  INICIALIZAÇÃO
 // =============================================================
 
-/** Aplica o fundo dinâmico automaticamente ao carregar a página. */
 window.addEventListener('load', () => {
   const horaAtual = new Date().getHours();
   definirFundoClima(0, horaAtual);
