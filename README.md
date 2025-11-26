@@ -1,5 +1,7 @@
 # 🌤 Aplicativo de Previsão do Tempo
+
 <br /> <div align="center"> <img src="https://imgur.com/q6ZRYV4.png" title="Prévia da Aplicação" /> </div> <br />
+
 <div align="center"> <img src="https://img.shields.io/github/repo-size/Rayssa-Ferraz/projeto_clima?style=flat-square" /> <img src="https://img.shields.io/badge/HTML-5-orange.svg" /> <img src="https://img.shields.io/badge/CSS-3-purple.svg" /> <img src="https://img.shields.io/badge/JavaScript-ES6+-yellow.svg" /> <img src="https://img.shields.io/github/last-commit/Rayssa-Ferraz/projeto_clima?style=flat-square" /> <img src="https://img.shields.io/github/issues/Rayssa-Ferraz/projeto_clima?style=flat-square" /> <img src="https://img.shields.io/github/issues-pr/Rayssa-Ferraz/projeto_clima?style=flat-square" /> <img src="https://img.shields.io/badge/License-MIT-blue.svg"> </div>
 
 <br />
@@ -95,20 +97,19 @@ cd projeto_clima
 │
 ├── 📁 assets/
 │   ├── 📁 css/
-│   │   └── 📄 styles.css      # Estilos principais
-│   │
+│   │   └── 📄 styles.css
 │   ├── 📁 js/
-│   │   └── 📄 api.js          # Lógica da aplicação
-│   │
-│   └── 📁 img/                # Ícones e imagens
+│   │   └── 📄 api.js
+│   └── 📁 img/
 │
 ├── 📁 tests/
-│   └── 📄 api.test.js         # Testes unitários (Jest)
+│   └── 📄 api.test.js
 │
-├── 📄 index.html               # Página principal
-├── 📄 LICENSE                  # Licença MIT
-├── 📄 README.md                # Documentação
-└── 📄 package.json             # Configurações do Jest
+├── 📄 index.html
+├── 📄 LICENSE
+├── 📄 NOTICE.md
+└── 📄 package.json
+
 ```
 <br />
 
@@ -177,6 +178,18 @@ Todos os testes unitários foram executados com sucesso ✅
 	
 - API pública sem chave
 
+Além disso, o projeto segue as diretrizes de Segurança e Privacidade estudadas no módulo, incluindo:
+
+- Content-Security-Policy (CSP) configurada no HTML
+
+- Aviso de Privacidade no rodapé
+
+- Revisão de uso de dependências e licenças
+
+- API pública sem necessidade de autenticação
+
+- Sem coleta, armazenamento ou compartilhamento de dados pessoais
+
 <br />
 
 ## 10. APIs Utilizadas
@@ -226,8 +239,56 @@ Este projeto está sob a Licença MIT.
 📄 Acesse aqui:
 👉 https://github.com/Rayssa-Ferraz/projeto_clima/blob/main/LICENSE
 
+📄 Atribuições de terceiros (conforme exigência do módulo):
+👉 https://github.com/Rayssa-Ferraz/projeto_clima/blob/main/NOTICE.md
+
 <br />
 
+## 14. Auditoria de Segurança, Privacidade e Licenciamento
+
+Esta aplicação passou por uma auditoria completa conforme as diretrizes do módulo 06 – Ética e Segurança, garantindo conformidade e boas práticas.
+
+### 🔐 Segurança
+
+- Proteção contra XSS via Content-Security-Policy (CSP)
+
+- Timeout de requisições usando AbortController
+
+- Tratamento robusto de erros (rede, servidor, entrada inválida)
+
+- Uso de HTTPS em todas as chamadas
+
+- Sem coleta de dados sensíveis
+
+### 👤 Privacidade
+
+- Nenhum dado pessoal é coletado, armazenado ou compartilhado
+
+- As requisições à API são processadas em tempo real
+
+- Aviso de privacidade exibido no rodapé conforme boas práticas
+
+### ⚖️ Licenciamento & Conformidade
+
+- Código próprio licenciado sob MIT
+
+- Arquivo NOTICE.md criado contendo todas as atribuições:
+
+- Google Fonts (OFL)
+
+- Weather Icons (MIT / OFL)
+
+- Open-Meteo (CC BY 4.0 — com atribuição obrigatória)
+
+- Cloudflare CDN
+
+### 📄 Arquivos incluídos como exigido:
+
+- LICENSE
+
+- NOTICE.md
+
+<br />
 
 ## ⭐Autora⭐
 
