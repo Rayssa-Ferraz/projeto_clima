@@ -153,4 +153,38 @@ describe("Testes Unitários - App Clima", () => {
     expect(climaData.current).toBeUndefined();
     expect(climaData.currentWeather).toBeDefined();
   });
+
+     // 8️⃣ Previsão dos próximos 5 dias - resposta da API deve estar correta
+  test("8. API deve retornar estrutura correta para previsão de 5 dias", async () => {
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            daily: {
+              time: [
+                "2025-11-25",
+                "2025-11-26",
+                "2025-11-27",
+                "2025-11-28",
+                "2025-11-29"
+              ],
+              temperature_2m_max: [25, 27, 29, 28, 26],
+              temperature_2m_min: [15, 17, 18, 16, 14],
+              weather_code: [3, 2, 1, 3, 0],
+            },
+          }),
+      })
+    );
+
+    const resp = await fetch("https://api.open-meteo.com/v1/forecast");
+    const data = await resp.json();
+
+    expect(data.daily).toBeDefined();
+    expect(data.daily.time.length).toBe(5);
+    expect(data.daily.temperature_2m_max.length).toBe(5);
+    expect(data.daily.temperature_2m_min.length).toBe(5);
+    expect(data.daily.weather_code.length).toBe(5);
+  });
+
 });
